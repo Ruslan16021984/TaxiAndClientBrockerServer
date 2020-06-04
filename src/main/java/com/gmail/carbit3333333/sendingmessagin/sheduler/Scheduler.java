@@ -20,7 +20,6 @@ public class Scheduler {
     }
     @Scheduled(fixedRateString = "1000", initialDelayString = "0")
     public void schedulingTask() {
-        log.info("Send messages due to schedule");
         greetingService.getTaxiWorkersQueue();
     }
 }

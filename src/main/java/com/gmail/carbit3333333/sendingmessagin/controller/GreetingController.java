@@ -1,5 +1,6 @@
 package com.gmail.carbit3333333.sendingmessagin.controller;
 
+import com.gmail.carbit3333333.sendingmessagin.model.AddressOrder;
 import com.gmail.carbit3333333.sendingmessagin.model.TaxiClient;
 import com.gmail.carbit3333333.sendingmessagin.model.TaxiWorker;
 import com.gmail.carbit3333333.sendingmessagin.service.GreetingService;
@@ -31,11 +32,13 @@ public class GreetingController {
     public void addTaxiWorker(TaxiWorker taxiWorker, Principal principal, SimpMessageHeaderAccessor headerAccessor) {
         taxiWorker.setUuId(principal.getName());
         greetingService.addTaxiWorker(taxiWorker, taxiWorker.getUuId());
+        log.info("" + taxiWorker.getLogin());
         headerAccessor.getSessionAttributes().put("username", taxiWorker.getLogin());
     }
     //здесь присылаются постоянно координаты водителя
     @MessageMapping("/sendCoordinatTaxi")
-    public void watchTaxi(TaxiWorker taxiWorker) {
+    public void watchTaxi(TaxiWorker taxiWorker, Principal principal, SimpMessageHeaderAccessor headerAccessor) {
+        taxiWorker.setUuId(principal.getName());
         greetingService.getCoordinatTaxi(taxiWorker);
     }
 //

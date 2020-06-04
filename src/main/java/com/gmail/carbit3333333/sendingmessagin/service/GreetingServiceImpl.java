@@ -2,7 +2,6 @@ package com.gmail.carbit3333333.sendingmessagin.service;
 
 import com.gmail.carbit3333333.sendingmessagin.model.TaxiClient;
 import com.gmail.carbit3333333.sendingmessagin.model.TaxiWorker;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -17,6 +16,7 @@ public class GreetingServiceImpl implements GreetingService {
     private final SimpMessagingTemplate simpMessagingTemplate;
 
     private static final String WS_MESSAGE_TRANSFER_DESTINATION = "/taxiOnline/greetings";
+    private static final String WS_MESSAGE_RQUEST_CLIENT_DESTINATION = "/requestclient/greetings";
     //эта константа нужна для отправки позиции в очереди
     private static final String WS_MESSAGE_ORDER_DESTINATION = "/queue/greetings";
     private Map<String, String> userNamesMap = new HashMap<>();
@@ -27,11 +27,11 @@ public class GreetingServiceImpl implements GreetingService {
     }
 
 
-//добавление водителя в конец очереди Queue и общий список Map
+    //добавление водителя в конец очереди Queue и общий список Map
     @Override
     public void addTaxiWorker(TaxiWorker taxiWorker, String uuId) {
-        userNamesMap.put(taxiWorker.getLogin(), uuId);
-        taxiWorkersQueue.add(taxiWorker.getLogin());
+        userNamesMap.put(taxiWorker.getPhone(), uuId);
+        taxiWorkersQueue.add(taxiWorker.getPhone());
         log.info("taxiWorkersQueue: " + taxiWorkersQueue.element());
         log.info("userNamesMap: " + userNamesMap.toString());
         //просто проверил связь с пользователем кто-бы он нибыл
@@ -39,21 +39,26 @@ public class GreetingServiceImpl implements GreetingService {
     }
 
     //метод обрабатывает запрос от клиента и отправляет первому в очереди таксисту taxiWorkersQueue.peek()
+    //todo:изменить AddressOrder на клиент
     @Override
     public void requestClient(TaxiClient taxiClient) {
-        String taxiWorkerLogin = taxiWorkersQueue.peek();
-        String taxiUuId = userNamesMap.get(taxiWorkerLogin);
-        simpMessagingTemplate.convertAndSendToUser(taxiUuId, WS_MESSAGE_TRANSFER_DESTINATION, taxiClient);
+        log.info("requestClient______----===>>" + taxiClient.getUuId());
+        userNamesMap.put(taxiClient.getPhone(), taxiClient.getUuId());
+        String taxiWorkerPhone = taxiWorkersQueue.peek();
+        String taxiUuId = userNamesMap.get(taxiWorkerPhone);
+        simpMessagingTemplate.convertAndSendToUser(taxiUuId, WS_MESSAGE_RQUEST_CLIENT_DESTINATION, taxiClient);
     }
 
     @Override
     public void deleteSomeUser() {
 
     }
+
     //метод получения координат от водителя и отправки определенному клиенту
     @Override
     public void getCoordinatTaxi(TaxiWorker taxiWorker) {
-        String clientUuid = userNamesMap.get(taxiWorker.getLoginClient());
+        log.info("Получил координаты" + taxiWorker.getUuId() + " ___ "+ taxiWorker.getClientPhone());
+        String clientUuid = userNamesMap.get(taxiWorker.getClientPhone());
         simpMessagingTemplate.convertAndSendToUser(clientUuid, WS_MESSAGE_TRANSFER_DESTINATION, taxiWorker);
     }
 
@@ -67,6 +72,7 @@ public class GreetingServiceImpl implements GreetingService {
         log.info("userNamesMap " + userNamesMap.toString());
         //здесь дальше внизу сразу вытягиваем из очереди taxiWorkersQueue и при наличии заказов отправляем запрос таксисту
     }
+
     //здесь происходит пробежка в течении 1 сек
     // по очереди и отстылка позиции каждому таксисту
     public void getTaxiWorkersQueue() {
