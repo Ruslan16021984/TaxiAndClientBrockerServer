@@ -49,10 +49,6 @@ public class GreetingServiceImpl implements GreetingService {
         simpMessagingTemplate.convertAndSendToUser(taxiUuId, WS_MESSAGE_RQUEST_CLIENT_DESTINATION, taxiClient);
     }
 
-    @Override
-    public void deleteSomeUser() {
-
-    }
 
     //метод получения координат от водителя и отправки определенному клиенту
     @Override

@@ -8,7 +8,6 @@ public interface GreetingService {
     void getCoordinatTaxi(TaxiWorker taxiWorker);
     void deleteTaxiWorker(String login);
     void requestClient(TaxiClient taxiClient);
-    void deleteSomeUser();
     void getTaxiWorkersQueue();
 
 }
