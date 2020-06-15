@@ -1,6 +1,5 @@
 package com.gmail.carbit3333333.sendingmessagin.controller;
 
-import com.gmail.carbit3333333.sendingmessagin.model.AddressOrder;
 import com.gmail.carbit3333333.sendingmessagin.model.TaxiClient;
 import com.gmail.carbit3333333.sendingmessagin.model.TaxiWorker;
 import com.gmail.carbit3333333.sendingmessagin.service.GreetingService;
@@ -41,9 +40,5 @@ public class GreetingController {
         taxiWorker.setUuId(principal.getName());
         greetingService.getCoordinatTaxi(taxiWorker);
     }
-//
-//    @RequestMapping(value = "/hello-convert-and-send", method = RequestMethod.POST)
-//    void echoConvertAndSend(@RequestParam("msg") String message) {
-//        greetingService.echoMessage(message);
-//    }
+
 }
