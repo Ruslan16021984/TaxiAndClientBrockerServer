@@ -32,7 +32,7 @@ public class GreetingController {
         taxiWorker.setUuId(principal.getName());
         greetingService.addTaxiWorker(taxiWorker, taxiWorker.getUuId());
         log.info("" + taxiWorker.getLogin());
-        headerAccessor.getSessionAttributes().put("username", taxiWorker.getLogin());
+        headerAccessor.getSessionAttributes().put("username", taxiWorker.getPhone());
     }
     //здесь присылаются постоянно координаты водителя
     @MessageMapping("/sendCoordinatTaxi")

@@ -7,6 +7,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -32,8 +33,8 @@ public class GreetingServiceImpl implements GreetingService {
     @Override
     public void addTaxiWorker(TaxiWorker taxiWorker, String uuId) {
         userNamesMap.put(taxiWorker.getPhone(), uuId);
-        taxiWorkersQueue.add(taxiWorker.getPhone());
-        log.info("taxiWorkersQueue: " + taxiWorkersQueue.get(taxiWorkersQueue.size() - 1));
+        addTaxiWorketToQeue(taxiWorker);
+        log.info("taxiWorkersQueue: " + taxiWorkersQueue.size());
         log.info("userNamesMap: " + userNamesMap.toString());
         //просто проверил связь с пользователем кто-бы он нибыл
         //simpMessagingTemplate.convertAndSendToUser(uuId, WS_MESSAGE_TRANSFER_DESTINATION, taxiWorker);
@@ -65,7 +66,7 @@ public class GreetingServiceImpl implements GreetingService {
     @Override
     public void deleteTaxiWorker(String login) {
 //        taxiWorkersQueue.remove();
-        deleteFromQueue(taxiWorkersQueue, login);
+        deleteFromQueue(login);
         userNamesMap.remove(login);
         log.info("deleteTaxiWorker " + login);
         log.info("taxiWorkersQueue " + taxiWorkersQueue.size());
@@ -76,11 +77,12 @@ public class GreetingServiceImpl implements GreetingService {
     // по очереди и отстылка позиции каждому таксисту
     public void getTaxiWorkersQueue() {
         int x = 0;
+        log.info("" +taxiWorkersQueue.size());
         if (taxiWorkersQueue.size() != 0) {
             for (String taxiWorker : taxiWorkersQueue) {
                 String uuId = userNamesMap.get(taxiWorker);
                 x = x + 1;
-                log.info("" + x);
+                log.info("taxiWorker " + taxiWorker);
                 String orderTaxi = String.valueOf(x);
                 simpMessagingTemplate.convertAndSendToUser(uuId, WS_MESSAGE_ORDER_DESTINATION, orderTaxi);
 
@@ -88,12 +90,19 @@ public class GreetingServiceImpl implements GreetingService {
         }
     }
 
-    private void deleteFromQueue(List<String> taxiWorkersQueue, String login) {
-        for (int i = 0; i < taxiWorkersQueue.size(); i++) {
-            if (taxiWorkersQueue.get(i).equals(login)){
-                taxiWorkersQueue.remove(i);
-                break;
-            }
+    private void deleteFromQueue(String login) {
+
+        if (taxiWorkersQueue.contains(login)){
+            taxiWorkersQueue.remove(login);
+        }
+    }
+
+    private void addTaxiWorketToQeue(TaxiWorker taxiWorker) {
+        if (taxiWorkersQueue.contains(taxiWorker.getPhone())){
+            taxiWorkersQueue.remove(taxiWorker.getPhone());
+            taxiWorkersQueue.add(taxiWorker.getPhone());
+        }else {
+            taxiWorkersQueue.add(taxiWorker.getPhone());
         }
     }
 
